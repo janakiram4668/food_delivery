@@ -1,0 +1,35 @@
+/* src/components/Menu.css */
+.menu-container {
+    padding: 20px;
+  }
+  
+  .menu-card {
+    border: 1px solid #ccc; /* Add a border to the card */
+    border-radius: 8px;     /* Rounded corners */
+    padding: 20px;          /* Inner padding */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-bottom: 20px;    /* Space below the card */
+  }
+  
+  .menu-item {
+    margin: 10px 0; /* Space between menu items */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between buttons */
+  }
+  
+  .quantity-controls button {
+    margin: 0; /* Reset margin */
+    padding: 5px 10px; /* Consistent padding */
+  }
+  
+  button {
+    padding: 5px 10px;
+  }
+  
