@@ -19,6 +19,7 @@ const Home = ({ restaurants }) => { // Accept restaurants as a prop
             <Link to={`/menu/${restaurant.id}`}>
               <button className="view-menu-btn">View Menu</button>
             </Link>
+            
           </div>
         ))}
       </div>

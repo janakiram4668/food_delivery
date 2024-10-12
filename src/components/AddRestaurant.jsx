@@ -1,79 +1,124 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const AddRestaurant = ({ addRestaurant }) => {
+const AddRestaurant = ({ addRestaurant, editingRestaurant, setEditingRestaurant, restaurants }) => {
   const [name, setName] = useState('');
   const [area, setArea] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [menuItems, setMenuItems] = useState([{ id: 1, name: '', price: '' }]); // Initialize with one item
+  const [menu, setMenu] = useState([{ id: 1, name: '', price: '' }]);
 
-  const handleMenuChange = (index, field, value) => {
-    const updatedMenuItems = [...menuItems];
-    updatedMenuItems[index][field] = value;
-    setMenuItems(updatedMenuItems);
-  };
+  useEffect(() => {
+    if (editingRestaurant) {
+      setName(editingRestaurant.name);
+      setArea(editingRestaurant.area);
+      setImageUrl(editingRestaurant.imageUrl);
+      setMenu(editingRestaurant.menu || [{ id: 1, name: '', price: '' }]);
+    } else {
+      // Reset the form when not editing
+      setName('');
+      setArea('');
+      setImageUrl('');
+      setMenu([{ id: 1, name: '', price: '' }]);
+    }
+  }, [editingRestaurant]);
 
   const handleAddMenuItem = () => {
-    setMenuItems((prev) => [...prev, { id: prev.length + 1, name: '', price: '' }]);
+    setMenu([...menu, { id: Date.now(), name: '', price: '' }]);
+  };
+
+  const handleChangeMenuItem = (index, field, value) => {
+    const updatedMenu = [...menu];
+    updatedMenu[index][field] = value;
+    setMenu(updatedMenu);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addRestaurant({ name, area, imageUrl }, menuItems);
-    // Reset form fields
+    const restaurant = {
+      id: editingRestaurant ? editingRestaurant.id : Date.now(),
+      name,
+      area,
+      imageUrl,
+      menu,
+    };
+    addRestaurant(restaurant, editingRestaurant ? editingRestaurant.id : null);
+    // Clear the form after submission
     setName('');
     setArea('');
     setImageUrl('');
-    setMenuItems([{ id: 1, name: '', price: '' }]); // Reset menu
+    setMenu([{ id: 1, name: '', price: '' }]);
   };
 
   return (
     <div>
-      <h2>Add New Restaurant</h2>
+      <h1>{editingRestaurant ? 'Edit Restaurant' : 'Add Restaurant'}</h1>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Restaurant Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Area"
-          value={area}
-          onChange={(e) => setArea(e.target.value)}
-          required
-        />
-        <input
-          type="url"
-          placeholder="Image URL"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          // required
-        />
-        
-        <h3>Menu Items</h3>
-        {menuItems.map((item, index) => (
-          <div key={index}>
+        <div>
+          <label>Restaurant Name:</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Area:</label>
+          <input
+            type="text"
+            value={area}
+            onChange={(e) => setArea(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Image URL:</label>
+          <input
+            type="text"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            // required
+          />
+        </div>
+        <h3>Menu</h3>
+        {menu.map((menuItem, index) => (
+          <div key={menuItem.id}>
+            <label>Menu Item Name:</label>
             <input
               type="text"
-              placeholder="Menu Item Name"
-              value={item.name}
-              onChange={(e) => handleMenuChange(index, 'name', e.target.value)}
+              value={menuItem.name}
+              onChange={(e) => handleChangeMenuItem(index, 'name', e.target.value)}
               required
             />
+            <label>Price:</label>
             <input
               type="number"
-              placeholder="Price"
-              value={item.price}
-              onChange={(e) => handleMenuChange(index, 'price', e.target.value)}
+              value={menuItem.price}
+              onChange={(e) => handleChangeMenuItem(index, 'price', e.target.value)}
               required
             />
           </div>
         ))}
-        <button type="button" onClick={handleAddMenuItem}>Add Menu Item</button>
-        <button type="submit">Add Restaurant</button>
+        <button type="button" onClick={handleAddMenuItem}>
+          Add Menu Item
+        </button>
+        <button type="submit">
+          {editingRestaurant ? 'Update' : 'Add Restaurant'}
+        </button>
       </form>
+
+      <h2>Added Restaurants</h2>
+      {Array.isArray(restaurants) && restaurants.length > 0 ? ( // Ensure restaurants is an array
+        <ul>
+          {restaurants.map((restaurant) => (
+            <li key={restaurant.id}>
+              {restaurant.name} - {restaurant.area}
+              <button onClick={() => setEditingRestaurant(restaurant)}>Edit</button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No restaurants added yet.</p>
+      )}
     </div>
   );
 };

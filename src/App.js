@@ -31,7 +31,7 @@ function App() {
     { id: 8, name: 'Akka Biryani', area: 'DLF', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdtfVeXniJ_NY4ZLvnAHlDgqI2RzNAJUK2sw&s' },
   ]);
 
-  const [menus, setMenus] = useState({
+  const [menus] = useState({
     1: [
       { id: 1, name: 'Biryani', price: 100 },
       { id: 2, name: 'Kebab', price: 150 },
@@ -114,6 +114,7 @@ function App() {
     ],
     // Add more menus for other restaurants...
   });
+  const [editingRestaurant, setEditingRestaurant] = useState(null);
 
   const addToCart = (restaurantName, itemName, quantity, price) => {
     const item = { restaurantName, itemName, quantity, price };
@@ -136,13 +137,21 @@ function App() {
     return userExists;
   };
 
-  const addRestaurant = (newRestaurant, menuItems) => {
-    const id = restaurants.length + 1; // Simple ID assignment
-    setRestaurants((prevRestaurants) => [...prevRestaurants, { id, ...newRestaurant }]);
-    setMenus((prevMenus) => ({
-      ...prevMenus,
-      [id]: menuItems, // Add the menu for the new restaurant
-    }));
+  const handleEditRestaurant = (restaurantId) => {
+    const restaurant = restaurants.find((r) => r.id === restaurantId);
+    setEditingRestaurant(restaurant);
+  };
+
+  const handleAddRestaurant = (restaurant, editingId) => {
+    setRestaurants((prevRestaurants) => {
+      if (editingId) {
+        return prevRestaurants.map((r) => (r.id === editingId ? restaurant : r));
+      } else {
+        return [...prevRestaurants, restaurant];
+      }
+    });
+    // Clear the editing restaurant after adding/updating
+    setEditingRestaurant(null);
   };
 
   return (
@@ -155,41 +164,55 @@ function App() {
         <div className="main-section">
           <main>
             <Routes>
-              <Route 
-                path="/" 
+              <Route
+                path="/"
                 element={
-                  users.length === 0 ? <Navigate to="/register" replace /> : 
-                  <ProtectedRoute isAuthenticated={isAuthenticated}>
-                    <Home restaurants={restaurants} /> {/* Pass restaurants to Home */}
-                  </ProtectedRoute>
-                } 
+                  users.length === 0 ? (
+                    <Navigate to="/register" replace />
+                  ) : (
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                      <Home restaurants={restaurants} onEditRestaurant={handleEditRestaurant} />
+                    </ProtectedRoute>
+                  )
+                }
               />
-              <Route 
-                path="/menu/:restaurantId" 
+              <Route
+                path="/menu/:restaurantId"
                 element={
                   <ProtectedRoute isAuthenticated={isAuthenticated}>
                     <Menu addToCart={addToCart} menus={menus} />
                   </ProtectedRoute>
-                } 
-              />  
-              
-              <Route 
-                path="/cart" 
+                }
+              />
+              <Route
+                path="/add-restaurant"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <AddRestaurant
+                      addRestaurant={handleAddRestaurant}
+                      editingRestaurant={editingRestaurant}
+                      setEditingRestaurant={setEditingRestaurant}
+                      restaurants={restaurants}
+                    />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cart"
                 element={
                   <ProtectedRoute isAuthenticated={isAuthenticated}>
                     <Cart cartItems={cart} removeFromCart={removeFromCart} />
                   </ProtectedRoute>
-                } 
+                }
               />
               <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login onLogin={handleLogin} />} />
               <Route path="/register" element={<Register onRegister={handleRegister} />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
-              <Route path="/add-restaurant" element={<AddRestaurant addRestaurant={addRestaurant} />} />
             </Routes>
           </main>
         </div>
-        
+
         <div className="footer-section">
           <Footer />
         </div>
