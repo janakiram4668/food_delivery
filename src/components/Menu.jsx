@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Menu.css';
 
 const Menu = () => {
   const { restaurantId } = useParams(); // Get the restaurant ID from the URL
   const [menu, setMenu] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false); // Admin state
+  const navigate = useNavigate(); // To navigate to AddMenu page
 
-  // Fetch menu for the selected restaurant
   useEffect(() => {
+    // Fetch menu for the selected restaurant
     const fetchMenu = async () => {
       try {
         const response = await axios.get(
@@ -26,6 +28,12 @@ const Menu = () => {
     };
 
     fetchMenu();
+
+    // Check if the user is an admin (from localStorage or API)
+    const user = JSON.parse(localStorage.getItem('user')); // Adjust based on your authentication logic
+    if (user?.role === 'admin') {
+      setIsAdmin(true);
+    }
   }, [restaurantId]);
 
   // Handle increasing/decreasing item quantity
@@ -72,12 +80,21 @@ const Menu = () => {
       alert('Failed to add item to cart');
     }
   };
-  
+
+  // Redirect to AddMenu page
+  const handleAddMenuRedirect = () => {
+    navigate('/addmenu', { state: { restaurantId } });
+  };
 
   return (
     <div className="menu-container">
       <div className="menu-header">
         <h1>Menu</h1>
+        {isAdmin && (
+          <button onClick={handleAddMenuRedirect} className="add-menu-button">
+            Add Menu
+          </button>
+        )}
       </div>
       <ul className="menu-list">
         {menu.length === 0 ? (

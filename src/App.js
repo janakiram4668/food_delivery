@@ -8,6 +8,7 @@ import Restaurants from './components/Restaurants';
 import Menu from './components/Menu';
 import Cart from './components/Cart';
 import AddRestaurant from './components/AddRestaurant';
+import AddMenu from './components/AddMenu';
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/menu/:restaurantId" element={<Menu />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/addrestaurant" element={<AddRestaurant />} />
+          <Route path="/addmenu" element={<AddMenu />} />
         </Routes>
         <Footer />
       </div>
