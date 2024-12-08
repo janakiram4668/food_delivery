@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Restaurants from './components/Restaurants';
 import Menu from './components/Menu';
 import Cart from './components/Cart';
+import AddRestaurant from './components/AddRestaurant';
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="/" element={token ? <Restaurants role={role} /> : <Navigate to="/login" />} />
           <Route path="/menu/:restaurantId" element={<Menu />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/addrestaurant" element={<AddRestaurant />} />
         </Routes>
         <Footer />
       </div>

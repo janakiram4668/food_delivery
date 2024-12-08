@@ -1,57 +1,65 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+// import './AddRestaurant.css';
 
-const AddRestaurant = ({ token }) => {
-  const [name, setName] = useState('');
-  const [area, setArea] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+const AddRestaurant = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    area: '',
+    imageUrl: '',
+  });
+
   const [message, setMessage] = useState('');
 
-  const handleAddRestaurant = async (e) => {
-    e.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/restaurant/add',
-        { name, area, imageUrl },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await axios.post('http://localhost:5000/api/restaurant/add', formData);
       setMessage('Restaurant added successfully!');
-      setName('');
-      setArea('');
-      setImageUrl('');
+      setFormData({ name: '', area: '', imageUrl: '' }); // Clear form
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Error adding restaurant!');
+      setMessage('Error adding restaurant: ' + error.message);
     }
   };
 
   return (
-    <div>
+    <div className="form-container">
       <h2>Add Restaurant</h2>
-      <form onSubmit={handleAddRestaurant}>
+      {message && <p className="message">{message}</p>}
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
+          name="name"
           placeholder="Restaurant Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={formData.name}
+          onChange={handleChange}
+          className="form-input"
           required
         />
         <input
           type="text"
+          name="area"
           placeholder="Area"
-          value={area}
-          onChange={(e) => setArea(e.target.value)}
+          value={formData.area}
+          onChange={handleChange}
+          className="form-input"
           required
         />
         <input
           type="text"
+          name="imageUrl"
           placeholder="Image URL"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
+          value={formData.imageUrl}
+          onChange={handleChange}
+          className="form-input"
         />
-        <button type="submit">Add Restaurant</button>
+        <button type="submit" className="form-button">Add Restaurant</button>
       </form>
-      <p>{message}</p>
     </div>
   );
 };

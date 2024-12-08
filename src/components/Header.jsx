@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom';
 import './Header.css';
 
 const Header = () => {
+  // Check if the logged-in user is an admin
+  const isAdmin = () => {
+    const user = JSON.parse(localStorage.getItem('user')); // Retrieve user data from localStorage
+    return user && user.role === 'admin';
+  };
+
   return (
     <header className="header">
       <div className="logo-container">
@@ -23,6 +29,11 @@ const Header = () => {
         <Link to="/cart" className="nav-button">
           Cart
         </Link>
+        {isAdmin() && (
+          <Link to="/addrestaurant" className="nav-button">
+            Add Restaurant
+          </Link>
+        )}
       </nav>
     </header>
   );
