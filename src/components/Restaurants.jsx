@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Restaurants.css';
 
-const Restaurants = ({ role }) => {
+const Restaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
   const navigate = useNavigate();
 
@@ -26,18 +26,29 @@ const Restaurants = ({ role }) => {
     navigate(`/menu/${restaurantId}`);
   };
 
+
+
+  // Handle Edit button click (navigate to edit page)
+  const handleEditClick = (restaurantId) => {
+    console.log(`Navigate to edit restaurant ID: ${restaurantId}`);
+    navigate(`/edit-restaurant/${restaurantId}`);
+  };
+
+  const userDetails= localStorage.getItem('user');
+  const parsedUser=JSON.parse(userDetails)
+
   return (
     <div>
       <div className="restaurants-header">
-        <h1>Restaurants</h1>
-        {role === 'admin' && (
+        <h1>Restaurants Near me</h1>
+        {/* {parsedUser.role === 'admin' && (
           <button
             className="add-restaurant-button"
             onClick={() => console.log('Navigate to Add Restaurant')}
           >
             Add Restaurant
           </button>
-        )}
+        )} */}
       </div>
 
       <div className="restaurant-list">
@@ -56,6 +67,14 @@ const Restaurants = ({ role }) => {
               >
                 View Menu
               </button>
+              {parsedUser.role === 'admin' && (
+                <button
+                  className="edit-button"
+                  onClick={() => handleEditClick(restaurant._id)}
+                >
+                  Edit
+                </button>
+              )}
             </div>
           </div>
         ))}

@@ -9,6 +9,7 @@ import Menu from './components/Menu';
 import Cart from './components/Cart';
 import AddRestaurant from './components/AddRestaurant';
 import AddMenu from './components/AddMenu';
+import EditRestaurant from './components/EditRestaurant';
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -25,6 +26,7 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/addrestaurant" element={<AddRestaurant />} />
           <Route path="/addmenu" element={<AddMenu />} />
+          <Route path="/edit-restaurant/:restaurantId" element={<EditRestaurant />} />
         </Routes>
         <Footer />
       </div>

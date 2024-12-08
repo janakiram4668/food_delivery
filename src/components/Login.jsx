@@ -20,10 +20,10 @@ const Login = ({ setToken }) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/api/user/login', formData);
-      console.log(response);
+      // console.log(response);
       const user_details = response.data.user;
-      console.log(user_details);
-      console.log(user_details.id);
+      // console.log(user_details);
+      // console.log(user_details.id);
       localStorage.setItem('user', JSON.stringify(user_details));
       setToken(response.data.token); // Save token to parent state
       setMessage(response.data.message);
