@@ -1,44 +1,87 @@
-/* src/components/Cart.css */
+/* Cart.css */
+
+/* Container for the whole cart */
 .cart-container {
-    padding: 20px;
-    max-width: 800px;
-    margin: auto;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f4f4f9;
+}
+
+/* Card container for each cart item */
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Individual cart item card */
+.cart-item-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  width: 550px; /* Adjust width as needed */
+  max-width: 100%; /* Ensure it doesn't overflow */
+  box-sizing: border-box; 
   
-  .cart-items {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Spacing between cards */
-  }
-  
-  .cart-item-card {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-  }
-  
-  .cart-item-card:hover {
-    transform: scale(1.02);
-  }
-  
-  h3 {
-    margin: 0;
-    color: #333;
-  }
-  
-  button {
-    background-color: #ff6347; /* Tomato color */
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #ff4500; /* Darker tomato color */
-  }
-  
-  
+}
+
+.cart-item-details {
+  margin-bottom: 10px;
+}
+
+.remove-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.remove-btn:hover {
+  background-color: #ff1a1a;
+}
+
+
+.cart-item-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Styling for item details inside the card */
+/* .cart-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+} */
+
+.cart-item-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.cart-item-restaurant {
+  font-size: 1.2rem;
+  color: #fd0000;
+}
+
+.cart-item-price,
+.cart-item-quantity {
+  font-size: 1.2rem;
+  color: #2c3e50;
+}
+
+/* Error message styling */
+.error-message {
+  color: rgb(236, 33, 33);
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}

@@ -1,124 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 
-const AddRestaurant = ({ addRestaurant, editingRestaurant, setEditingRestaurant, restaurants }) => {
+const AddRestaurant = ({ token }) => {
   const [name, setName] = useState('');
   const [area, setArea] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [menu, setMenu] = useState([{ id: 1, name: '', price: '' }]);
+  const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    if (editingRestaurant) {
-      setName(editingRestaurant.name);
-      setArea(editingRestaurant.area);
-      setImageUrl(editingRestaurant.imageUrl);
-      setMenu(editingRestaurant.menu || [{ id: 1, name: '', price: '' }]);
-    } else {
-      // Reset the form when not editing
+  const handleAddRestaurant = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/restaurant/add',
+        { name, area, imageUrl },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage('Restaurant added successfully!');
       setName('');
       setArea('');
       setImageUrl('');
-      setMenu([{ id: 1, name: '', price: '' }]);
+    } catch (error) {
+      setMessage(error.response?.data?.message || 'Error adding restaurant!');
     }
-  }, [editingRestaurant]);
-
-  const handleAddMenuItem = () => {
-    setMenu([...menu, { id: Date.now(), name: '', price: '' }]);
-  };
-
-  const handleChangeMenuItem = (index, field, value) => {
-    const updatedMenu = [...menu];
-    updatedMenu[index][field] = value;
-    setMenu(updatedMenu);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const restaurant = {
-      id: editingRestaurant ? editingRestaurant.id : Date.now(),
-      name,
-      area,
-      imageUrl,
-      menu,
-    };
-    addRestaurant(restaurant, editingRestaurant ? editingRestaurant.id : null);
-    // Clear the form after submission
-    setName('');
-    setArea('');
-    setImageUrl('');
-    setMenu([{ id: 1, name: '', price: '' }]);
   };
 
   return (
     <div>
-      <h1>{editingRestaurant ? 'Edit Restaurant' : 'Add Restaurant'}</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Restaurant Name:</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Area:</label>
-          <input
-            type="text"
-            value={area}
-            onChange={(e) => setArea(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Image URL:</label>
-          <input
-            type="text"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            // required
-          />
-        </div>
-        <h3>Menu</h3>
-        {menu.map((menuItem, index) => (
-          <div key={menuItem.id}>
-            <label>Menu Item Name:</label>
-            <input
-              type="text"
-              value={menuItem.name}
-              onChange={(e) => handleChangeMenuItem(index, 'name', e.target.value)}
-              required
-            />
-            <label>Price:</label>
-            <input
-              type="number"
-              value={menuItem.price}
-              onChange={(e) => handleChangeMenuItem(index, 'price', e.target.value)}
-              required
-            />
-          </div>
-        ))}
-        <button type="button" onClick={handleAddMenuItem}>
-          Add Menu Item
-        </button>
-        <button type="submit">
-          {editingRestaurant ? 'Update' : 'Add Restaurant'}
-        </button>
+      <h2>Add Restaurant</h2>
+      <form onSubmit={handleAddRestaurant}>
+        <input
+          type="text"
+          placeholder="Restaurant Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Area"
+          value={area}
+          onChange={(e) => setArea(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Image URL"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+        />
+        <button type="submit">Add Restaurant</button>
       </form>
-
-      <h2>Added Restaurants</h2>
-      {Array.isArray(restaurants) && restaurants.length > 0 ? ( // Ensure restaurants is an array
-        <ul>
-          {restaurants.map((restaurant) => (
-            <li key={restaurant.id}>
-              {restaurant.name} - {restaurant.area}
-              <button onClick={() => setEditingRestaurant(restaurant)}>Edit</button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No restaurants added yet.</p>
-      )}
+      <p>{message}</p>
     </div>
   );
 };

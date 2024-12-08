@@ -1,49 +1,120 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import './Menu.css'; // Optional for styling
+import { useParams, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import './Menu.css';
 
-const Menu = ({ addToCart, menus }) => {
-  const { restaurantId } = useParams();
-  const [menuItems, setMenuItems] = useState([]);
-  const [quantities, setQuantities] = useState({}); // Manage quantities for items
+const Menu = () => {
+  const { restaurantId } = useParams(); // Get the restaurant ID from the URL
+  const [menu, setMenu] = useState([]);
 
+  // Fetch menu for the selected restaurant
   useEffect(() => {
-    setMenuItems(menus[restaurantId] || []);
-  }, [restaurantId, menus]);
+    const fetchMenu = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/restaurants/${restaurantId}/menu`
+        );
+        setMenu(
+          response.data.map((item) => ({
+            ...item,
+            quantity: 0, // Initialize quantity for each item
+          }))
+        );
+      } catch (error) {
+        console.error('Error fetching menu:', error);
+      }
+    };
 
-  const handleQuantityChange = (itemId, change) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [itemId]: Math.max(0, (prev[itemId] || 0) + change), // Ensure quantity does not go below 0
-    }));
+    fetchMenu();
+  }, [restaurantId]);
+
+  // Handle increasing/decreasing item quantity
+  const handleQuantityChange = (itemId, operation) => {
+    setMenu((prevMenu) =>
+      prevMenu.map((item) =>
+        item._id === itemId
+          ? {
+              ...item,
+              quantity:
+                operation === 'increase'
+                  ? (item.quantity || 0) + 1
+                  : Math.max((item.quantity || 0) - 1, 0),
+            }
+          : item
+      )
+    );
   };
 
-  const handleAddToCart = (itemName, quantity) => {
-    const item = menuItems.find(item => item.name === itemName);
-    if (quantity > 0 && item) {
-      addToCart(`Restaurant ${restaurantId}`, item.name, quantity, item.price);
-      setQuantities((prev) => ({ ...prev, [itemName]: 0 })); // Reset quantity after adding to cart
+  // Handle "Add to Cart" button click
+  const handleAddToCart = async (item) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user')); // Get user from localStorage
+      const userId = user?.id; // Extract userId
+  
+      if (!userId) {
+        alert('User not logged in. Please login to add items to cart.');
+        return;
+      }
+  
+      const cartItem = {
+        itemId: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity || 1, // Default to 1 if not set
+        userId, // Include userId in the request
+        restaurantId, // Include restaurantId
+      };
+      console.log('Cart Item:', cartItem);
+      const response = await axios.post('http://localhost:5000/api/cart/add', cartItem);
+      alert(response.data.message); // Display success message
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+      alert('Failed to add item to cart');
     }
   };
+  
 
   return (
     <div className="menu-container">
-      <h1>Menu for Restaurant {restaurantId}</h1>
-      <div className="menu-card">
-        {menuItems.map((item) => (
-          <div key={item.id} className="menu-item">
-            <h3>{item.name} - ${item.price}</h3>
-            <div className="quantity-controls">
-              <button onClick={() => handleQuantityChange(item.id, -1)}>-</button>
-              <span>{quantities[item.id] || 0}</span>
-              <button onClick={() => handleQuantityChange(item.id, 1)}>+</button>
-              <button onClick={() => handleAddToCart(item.name, quantities[item.id] || 0)}>
+      <div className="menu-header">
+        <h1>Menu</h1>
+      </div>
+      <ul className="menu-list">
+        {menu.length === 0 ? (
+          <p>No menu items available</p>
+        ) : (
+          menu.map((item) => (
+            <li key={item._id} className="menu-item">
+              <div>
+                <strong>{item.name}</strong>
+                <div className="menu-item-price">${item.price}</div>
+              </div>
+              <div className="quantity-controls">
+                <button
+                  onClick={() => handleQuantityChange(item._id, 'decrease')}
+                  className="quantity-button"
+                >
+                  -
+                </button>
+                <span className="quantity-display">{item.quantity}</span>
+                <button
+                  onClick={() => handleQuantityChange(item._id, 'increase')}
+                  className="quantity-button"
+                >
+                  +
+                </button>
+              </div>
+              <button
+                onClick={() => handleAddToCart(item)}
+                className="add-to-cart-button"
+                disabled={item.quantity === 0}
+              >
                 Add to Cart
               </button>
-            </div>
-          </div>
-        ))}
-      </div>
+            </li>
+          ))
+        )}
+      </ul>
     </div>
   );
 };

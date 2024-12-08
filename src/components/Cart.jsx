@@ -1,99 +1,64 @@
-// src/components/Cart.jsx
-import React, { useState } from 'react';
-import './Cart.css'; // Make sure to create this CSS file for styling
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import './Cart.css';
 
-const Cart = ({ cartItems, removeFromCart }) => {
-  const [isCheckout, setIsCheckout] = useState(false);
-  const [cardDetails, setCardDetails] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-  });
-  const navigate = useNavigate(); // Use useNavigate instead of useHistory
+const Cart = () => {
+  const [cartItems, setCartItems] = useState([]);
+  const [error, setError] = useState('');
 
-  const handleCheckout = () => {
-    setIsCheckout(true);
-  };
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user?.id;
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setCardDetails({
-      ...cardDetails,
-      [name]: value,
-    });
-  };
+        if (!userId) {
+          setError('User not logged in. Please login to view cart.');
+          return;
+        }
 
-  const handlePayment = (event) => {
-    event.preventDefault();
+        const response = await axios.get(`http://localhost:5000/api/cart/${userId}`);
+        setCartItems(response.data);
+      } catch (error) {
+        console.error('Error fetching cart items:', error);
+        setError('Failed to fetch cart items. Please try again later.');
+      }
+    };
 
-    // Basic logic for payment processing
-    const { cardNumber, expiryDate, cvv } = cardDetails;
-    if (cardNumber && expiryDate && cvv) {
-      // Simulate payment processing
-      setTimeout(() => {
-        navigate('/order-confirmation'); // Redirect to order confirmation page
-      }, 1000); // Simulate delay for payment processing
-    } else {
-      alert('Please fill in all fields correctly.');
+    fetchCartItems();
+  }, []);
+
+  const handleRemoveItem = async (cartItemId) => {
+    try {
+      const response = await axios.delete(`http://localhost:5000/api/cart/remove/${cartItemId}`);
+      // Remove item from the local state after successful removal
+      setCartItems(cartItems.filter(item => item._id !== cartItemId));
+    } catch (error) {
+      console.error('Error removing item:', error);
+      setError('Failed to remove item. Please try again later.');
     }
   };
 
   return (
     <div className="cart-container">
-      <h2>Your Cart</h2>
+      <h1>Your Cart</h1>
+      {error && <p className="error-message">{error}</p>}
       {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <p>No items in the cart</p>
       ) : (
         <div className="cart-items">
-          {cartItems.map((item, index) => (
-            <div key={index} className="cart-item-card">
-              <h3>{item.restaurantName}</h3>
-              <p>{item.itemName}</p>
-              <p>Quantity: {item.quantity}</p>
-              <p>Price: ${item.price}</p>
-              <button onClick={() => removeFromCart(index)}>Remove</button>
+          {cartItems.map((item) => (
+            <div key={item._id} className="cart-item-card">
+              <div className="cart-item-details">
+                <h3 className="cart-item-name">{item.name}</h3>
+                <p className="cart-item-restaurant">Restaurant: {item.restaurantId.name}</p> {/* Display restaurant name */}
+                <p className="cart-item-price">Price: ${item.price}</p>
+                <p className="cart-item-quantity">Quantity: {item.quantity}</p>
+              </div>
+              <button className="remove-btn" onClick={() => handleRemoveItem(item._id)}>Remove</button>
             </div>
           ))}
-          <button onClick={handleCheckout}>Checkout</button>
         </div>
-      )}
-
-      {isCheckout && (
-        <form onSubmit={handlePayment} className="checkout-form">
-          <h2>Checkout</h2>
-          <label>
-            Card Number:
-            <input
-              type="text"
-              name="cardNumber"
-              value={cardDetails.cardNumber}
-              onChange={handleInputChange}
-              required
-            />
-          </label>
-          <label>
-            Expiry Date (MM/YY):
-            <input
-              type="text"
-              name="expiryDate"
-              value={cardDetails.expiryDate}
-              onChange={handleInputChange}
-              required
-            />
-          </label>
-          <label>
-            CVV:
-            <input
-              type="text"
-              name="cvv"
-              value={cardDetails.cvv}
-              onChange={handleInputChange}
-              required
-            />
-          </label>
-          <button type="submit">Pay</button>
-        </form>
       )}
     </div>
   );
