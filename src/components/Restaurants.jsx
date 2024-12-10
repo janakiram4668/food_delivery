@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Restaurants.css';
+import Header from './Header';
 
 const Restaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -38,6 +39,8 @@ const Restaurants = () => {
   const parsedUser=JSON.parse(userDetails)
 
   return (
+    <>
+    <Header/>
     <div>
       <div className="restaurants-header">
         <h1>Restaurants Near me</h1>
@@ -80,6 +83,7 @@ const Restaurants = () => {
         ))}
       </div>
     </div>
+    </>
   );
 };
 

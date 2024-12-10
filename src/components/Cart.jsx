@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Cart.css';
+import Header from './Header';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -40,6 +41,8 @@ const Cart = () => {
   };
 
   return (
+    <>
+    <Header/>
     <div className="cart-container">
       <h1>Your Cart</h1>
       {error && <p className="error-message">{error}</p>}
@@ -61,6 +64,7 @@ const Cart = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

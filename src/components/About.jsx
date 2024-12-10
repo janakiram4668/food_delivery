@@ -1,9 +1,12 @@
 // src/components/About.jsx
 import React from 'react';
 import './About.css';
+import Header from './Header';
 
 const About = () => {
   return (
+    <>
+    <Header/>
     <div className="about-container">
       <h1>About Us</h1>
       <p>
@@ -28,6 +31,7 @@ const About = () => {
         For any inquiries or feedback, feel free to contact us at <a href="mailto:support@fooddelivery.com">support@fooddelivery.com</a>. We value your input and are always looking to improve our service.
       </p>
     </div>
+    </>
   );
 };
 

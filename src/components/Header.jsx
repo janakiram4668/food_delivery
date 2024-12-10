@@ -8,6 +8,8 @@ const Header = () => {
     const user = JSON.parse(localStorage.getItem('user')); // Retrieve user data from localStorage
     return user && user.role === 'admin';
   };
+  const userDetails= localStorage.getItem('user');
+  const parsedUser=JSON.parse(userDetails)
 
   return (
     <header className="header">
@@ -34,6 +36,11 @@ const Header = () => {
             Add Restaurant
           </Link>
         )}
+        {userDetails &&(
+
+            <Link to = '/login'>logout</Link>
+        )}
+        
       </nav>
     </header>
   );

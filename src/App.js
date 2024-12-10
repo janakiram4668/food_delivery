@@ -10,6 +10,8 @@ import Cart from './components/Cart';
 import AddRestaurant from './components/AddRestaurant';
 import AddMenu from './components/AddMenu';
 import EditRestaurant from './components/EditRestaurant';
+import EditMenuItem from './components/EditMenuItem';
+import About from './components/About'
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -17,7 +19,6 @@ const App = () => {
   return (
     <Router>
       <div>
-        {token && <Header />} {/* Show Header only when logged in */}
         <Routes>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={!token ? <Login setToken={setToken} /> : <Navigate to="/" />} />
@@ -27,6 +28,8 @@ const App = () => {
           <Route path="/addrestaurant" element={<AddRestaurant />} />
           <Route path="/addmenu" element={<AddMenu />} />
           <Route path="/edit-restaurant/:restaurantId" element={<EditRestaurant />} />
+          <Route path="/edit-menu-item/:itemId" element={<EditMenuItem />} />
+          <Route path="/about" element={<About />} />
         </Routes>
         <Footer />
       </div>

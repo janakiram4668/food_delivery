@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom'; // Import Link for navigation
 import './Login.css';
+import Header from './Header';
 
 const Login = ({ setToken }) => {
   const [formData, setFormData] = useState({
@@ -31,8 +32,10 @@ const Login = ({ setToken }) => {
       setMessage(error.response?.data?.message || 'Something went wrong!');
     }
   };
-
+  
   return (
+    <>
+    <Header/>
     <div className="login-container">
       <h2 className="form-title">Login</h2>
       <form onSubmit={handleSubmit}>
@@ -66,6 +69,7 @@ const Login = ({ setToken }) => {
 
       {message && <p className={message.includes('success') ? 'success-message' : 'error-message'}>{message}</p>}
     </div>
+    </>
   );
 };
 
